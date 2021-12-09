@@ -21,6 +21,24 @@ class Task3Test extends TestCase
     protected $modelPluralName = "employers";
     protected $modelSingleName = "employer";
 
+    /* Checks model saving */
+    public function testStoreOk()
+    {
+        $data = Employer::factory()->make()->toArray();
+        $routeName = $this->modelPluralName . ".store";
+        $redirectRouteName = $this->modelPluralName . ".show";
+        $response = $this->post(route($routeName), $data);
+        $response->assertRedirect(route($redirectRouteName, [$this->modelSingleName => 1]));
+    }
+
+    /* Checks saving validation */
+    public function testStoreError()
+    {
+        $routeName = $this->modelPluralName . ".store";
+        $response = $this->post(route($routeName), []);
+        $response->assertStatus(Response::HTTP_FOUND);
+        $response->assertSessionHasErrors($this->modelFields);
+    }
 
     /* Checks json pagination */
     public function testIndex()
@@ -43,25 +61,6 @@ class Task3Test extends TestCase
         $response = $this->get(route($routeName));
         $response->assertViewIs($routeName);
         $response->assertSee($this->modelPluralName . " form");
-    }
-
-    /* Checks model saving */
-    public function testStoreOk()
-    {
-        $data = Employer::factory()->make()->toArray();
-        $routeName = $this->modelPluralName . ".store";
-        $redirectRouteName = $this->modelPluralName . ".show";
-        $response = $this->post(route($routeName), $data);
-        $response->assertRedirect(route($redirectRouteName, [$this->modelSingleName => 1]));
-    }
-
-    /* Checks saving validation */
-    public function testStoreError()
-    {
-        $routeName = $this->modelPluralName . ".store";
-        $response = $this->post(route($routeName), []);
-        $response->assertStatus(Response::HTTP_FOUND);
-        $response->assertSessionHasErrors($this->modelFields);
     }
 
 }
